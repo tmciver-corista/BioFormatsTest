@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/bio-formats.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/loci-common.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/ome-xml.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/loci_plugins.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/ij.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/scifio.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/log4j-core.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/BioFormatsTest/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="/opt/libjpeg-turbo/classes/turbojpeg.jar"/>
+	<classpathentry kind="lib" path="/Users/tmciver/Documents/workspace/native-lib-loader/target/native-lib-loader-2.0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="/Applications/kryo-2.21/jars/production/kryo-2.21.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
