@@ -3,15 +3,22 @@ package com.corista.bioformats.test;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class TestReader {
 	
-	private static int READ_DIMENSION = 1024;
+	private static final String READ_WIDTH_PARAM_NAME = "readWidth";
+	private static final String READ_HEIGHT_PARAM_NAME = "readHeight";
+
+	private static final int DEFAULT_READ_WIDTH = 256;
+	private static final int DEFAULT_READ_HEIGHT = 256;
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
 		// make sure we have an argument
 		if (args.length < 1) {
@@ -26,7 +33,7 @@ public class TestReader {
 			System.err.println("Image file does not exist.");
 			System.exit(1);
 		}
-		
+
 		// get the image directory (output directory)
 		File imageDir = imageFile.getParentFile();
 		File outputDir = new File(imageDir, imageFile.getName() + "_" + System.currentTimeMillis());
@@ -54,11 +61,11 @@ public class TestReader {
 		long seconds;
 		double minutes;
 		for (int xTile = 0; xTile < xTiles; ++xTile) {
-			x = xTile * READ_DIMENSION;
+			x = xTile * readWidth;
 			for (int yTile = 0; yTile < yTiles; ++yTile) {
-				y = yTile * READ_DIMENSION;
+				y = yTile * readHeight;
 				try {
-					image = reader.read(x, y, READ_DIMENSION, READ_DIMENSION);
+					image = reader.read(x, y, readWidth, readHeight);
 				} catch (IOException e) {
 					System.err.println("Caught an exception while trying to read a tile; continuing.");
 					continue;
@@ -84,6 +91,6 @@ public class TestReader {
 		// calc run time
 		seconds = (System.currentTimeMillis() - startMillis) / 1000;
 		minutes = seconds / 60.0;
-		System.out.println("Duration: " + seconds + " seconds (" + minutes + " minutes)");
+		System.out.println(String.format("Duration: %d seconds (%.1f minutes)", seconds, minutes));
 	}
 }
