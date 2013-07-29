@@ -10,6 +10,8 @@ public class TestReader {
 	
 	private static final String READ_WIDTH_PARAM_NAME = "readWidth";
 	private static final String READ_HEIGHT_PARAM_NAME = "readHeight";
+	
+	private static final String USAGE = "</path/to/slide-data-file> [read-width] [read-height]";
 
 	private static final int DEFAULT_READ_WIDTH = 256;
 	private static final int DEFAULT_READ_HEIGHT = 256;
@@ -22,7 +24,7 @@ public class TestReader {
 		
 		// make sure we have an argument
 		if (args.length < 1) {
-			System.err.println("You must supply an image file path.");
+			System.err.println(USAGE);
 			System.exit(1);
 		}
 		
@@ -46,9 +48,36 @@ public class TestReader {
 			return;
 		}
 		
+		// set the tile dimensions
+		int readWidth = DEFAULT_READ_WIDTH;
+		int readHeight = DEFAULT_READ_HEIGHT;
+		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bioformats-test.properties");
+		if (stream != null) {
+			Properties props = new Properties();
+			props.load(stream);
+			String readWidthStr = props.getProperty(READ_WIDTH_PARAM_NAME);
+			String readHeightStr = props.getProperty(READ_HEIGHT_PARAM_NAME);
+			if (readWidthStr != null) {
+				readWidth = Integer.parseInt(readWidthStr);
+			}
+			if (readHeightStr != null) {
+				readHeight = Integer.parseInt(readHeightStr);
+			}
+		}
+		
+		// override readWidth and readHeight with values given on the command line, if they were given
+		if (args.length > 1) {
+			readWidth = Integer.parseInt(args[1]);
+		}
+		if (args.length > 2) {
+			readHeight = Integer.parseInt(args[2]);
+		}
+		
+		System.out.println("read width: " + readWidth + ", read height: " + readHeight);
+		
 		// calc x and y tile numbers
-		int xTiles = reader.getWidth() / READ_DIMENSION;
-		int yTiles = reader.getHeight() / READ_DIMENSION;
+		int xTiles = reader.getWidth() / readWidth;
+		int yTiles = reader.getHeight() / readHeight;
 		int numTiles = xTiles * yTiles;
 		
 		// start timer
