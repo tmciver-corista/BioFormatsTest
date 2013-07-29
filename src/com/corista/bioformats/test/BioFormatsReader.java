@@ -8,12 +8,15 @@ import java.io.IOException;
 import loci.common.Region;
 import loci.formats.FormatException;
 import loci.formats.IFormatReader;
-import loci.plugins.BF;
+import loci.plugins.in.ImagePlusReader;
+import loci.plugins.in.ImportProcess;
 import loci.plugins.in.ImporterOptions;
 
 public class BioFormatsReader implements ImageReader {
 
 	private ImporterOptions options;
+	
+	private ImagePlusReader reader;
 	private int width;
 	private int height;
 
@@ -24,23 +27,35 @@ public class BioFormatsReader implements ImageReader {
 		options.setId(filename);
 		options.setCrop(true);
 		
+		ImportProcess process = new ImportProcess(options);
+		try {
+			if (!process.execute()) {
+				throw new IOException("Error executing ImportProcess.");
+			}
+		} catch (FormatException e1) {
+			throw new IOException("Error executing ImportProcess.");
+		}
+		
 		// get the width and height
 		// create format reader
-	    IFormatReader reader = new loci.formats.ImageReader();
+	    reader = new ImagePlusReader(process);
+	    
+	    // use an IFormatReader to get width and height
+	    IFormatReader formatReader = new loci.formats.ImageReader();
 	    
 	    // set the ID (image file name)
 	    try {
-			reader.setId(filename);
+			formatReader.setId(filename);
 		} catch (FormatException e) {
-			reader.close();
+			formatReader.close();
 			throw new IOException(e);
 		}
 
 	    // get the width and height
-	    width = reader.getSizeX();
-	    height = reader.getSizeY();
+	    width = formatReader.getSizeX();
+	    height = formatReader.getSizeY();
 	    
-	    reader.close();
+	    formatReader.close();
 	}
 
 	@Override
@@ -51,7 +66,7 @@ public class BioFormatsReader implements ImageReader {
 		
 		ImagePlus[] imps = null;
 		try {
-			imps = BF.openImagePlus(options);
+			imps = reader.openImagePlus();
 		} catch (FormatException fe) {
 			System.err.println("Caught FormatException");
 			throw new IOException(fe);
@@ -68,6 +83,11 @@ public class BioFormatsReader implements ImageReader {
 		BufferedImage image = (BufferedImage)imps[0].getImage();
 		
 		return image;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
 	}
 
 	@Override
