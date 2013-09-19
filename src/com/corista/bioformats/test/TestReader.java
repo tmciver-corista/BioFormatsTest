@@ -35,10 +35,6 @@ public class TestReader {
 			System.err.println("Image file does not exist.");
 			System.exit(1);
 		}
-
-		// get the image directory (output directory)
-		File imageDir = imageFile.getParentFile();
-		File outputDir = new File(imageDir, imageFile.getName() + "_" + System.currentTimeMillis());
 		
 		ImageReader reader;
 		try {
@@ -80,46 +76,79 @@ public class TestReader {
 		int yTiles = reader.getHeight() / readHeight;
 		int numTiles = xTiles * yTiles;
 		
+		// create the threads
+		Thread[] threads = new Thread[] {
+				new TileThread(reader, readWidth, readHeight, 0, 0, xTiles / 2, yTiles / 2),
+				new TileThread(reader, readWidth, readHeight, xTiles / 2, 0, xTiles / 2, yTiles / 2),
+				new TileThread(reader, readWidth, readHeight, 0, yTiles / 2, xTiles / 2, yTiles / 2),
+				new TileThread(reader, readWidth, readHeight, xTiles / 2, yTiles / 2, xTiles / 2, yTiles / 2)};
+		
+		// start the threads
+		for (Thread thread : threads) {
+			thread.start();
+		}
+		
+		// and wait until they finish
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class TileThread extends Thread {
+	
+	private ImageReader reader;
+	private int tileWidth;
+	private int tileHeight;
+	private int topLeftTileX;
+	private int topLeftTileY;
+	private int numTilesX;
+	private int numTilesY;
+
+	public TileThread(ImageReader reader, int tileWidth, int tileHeight, int topLeftTileX, int topLeftTileY,
+			int numTilesX, int numTilesY) {
+		this.reader = reader;
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
+		this.topLeftTileX = topLeftTileX;
+		this.topLeftTileY = topLeftTileY;
+		this.numTilesX = numTilesX;
+		this.numTilesY = numTilesY;
+	}
+
+	@Override
+	public void run() {
+		
 		// start timer
 		long startMillis = System.currentTimeMillis();
 		
-		BufferedImage image = null;
-		File outputFile = null;
-		int x, y;
 		int tileNum = 1;
-		long seconds;
-		double minutes;
-		for (int xTile = 0; xTile < xTiles; ++xTile) {
-			x = xTile * readWidth;
-			for (int yTile = 0; yTile < yTiles; ++yTile) {
-				y = yTile * readHeight;
+		int numTiles = numTilesX * numTilesY;
+		for (int xTile = topLeftTileX; xTile < topLeftTileX + numTilesX; ++xTile) {
+			int x = xTile * tileWidth;
+			for (int yTile = topLeftTileY; yTile < topLeftTileY + numTilesY; ++yTile) {
+				int y = yTile * tileHeight;
 				try {
-					image = reader.read(x, y, readWidth, readHeight);
-				} catch (IOException e) {
-					System.err.println("Caught an exception while trying to read a tile; continuing.");
+					BufferedImage image = reader.read(x, y, tileWidth, tileHeight);
+				} catch (Exception e) {
+					System.err.println("In thread: " + this.getName() + ", Caught an exception while trying to read tile (" + xTile + ", " + yTile + "), " + e);
 					continue;
 				}
-				
-				// write image to file
-//				outputFile = new File(outputDir, "tile_" + xTile + "_" + yTile + ".jpg");
-//				try {
-//					ImageIO.write(image, "jpg", outputFile);
-//				} catch (IOException e) {
-//					System.err.println("Got an exception while trying to write image to file; continuing.");
-//					continue;
-//				}
-				
-				seconds = (System.currentTimeMillis() - startMillis) / 1000;
-				minutes = seconds / 60.0;
-				double percentComplete = (double)tileNum / numTiles *100;
-				System.out.println(String.format("Read tile %d of %d (%.1f%%) in %d seconds (%.1f minutes)", tileNum, numTiles, percentComplete, seconds, minutes));
 				tileNum++;
 			}
 		}
-		
-		// calc run time
-		seconds = (System.currentTimeMillis() - startMillis) / 1000;
-		minutes = seconds / 60.0;
-		System.out.println(String.format("Duration: %d seconds (%.1f minutes)", seconds, minutes));
+		System.out.println(this + " processed " + tileNum + " tiles.");
+	}
+
+	@Override
+	public String toString() {
+		return "TileThread [topLeftTileX=" + topLeftTileX + ", topLeftTileY="
+				+ topLeftTileY + ", numTilesX=" + numTilesX + ", numTilesY="
+				+ numTilesY + "]";
 	}
 }
