@@ -1,4 +1,4 @@
-package com.corista.bioformats.test;
+package com.corista.tilereader;
 
 import ij.ImagePlus;
 
