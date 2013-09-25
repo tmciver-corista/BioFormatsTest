@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class TestReader {
+public class TileReader {
 	
 	private static final String READ_WIDTH_PARAM_NAME = "readWidth";
 	private static final String READ_HEIGHT_PARAM_NAME = "readHeight";
