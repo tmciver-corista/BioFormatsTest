@@ -38,6 +38,7 @@ public class TileReaderCLI {
 			System.exit(1);
 		}
 		
+		// create an ImageReader
 		ImageReader reader;
 		try {
 			reader = new BioFormatsReader(imageFilePath);
@@ -45,9 +46,8 @@ public class TileReaderCLI {
 			e.printStackTrace();
 			return;
 		}
-		
 		System.out.println("Source image has size " + reader.getHeight() + "x" + reader.getWidth() + " pixels.");
-		
+
 		// set the tile dimensions
 		int readWidth = DEFAULT_READ_WIDTH;
 		int readHeight = DEFAULT_READ_HEIGHT;
@@ -70,10 +70,13 @@ public class TileReaderCLI {
 				}
 			}
 		}
+		
+		// create a TileReader
+		TileReader tileReader = new TileReader(reader, readWidth, readHeight);
 
 		// calc x and y tile numbers
-		int xTiles = (int)Math.ceil((double)reader.getWidth() / readWidth);
-		int yTiles = (int)Math.ceil((double)reader.getHeight() / readHeight);
+		int xTiles = tileReader.getNumXTiles();
+		int yTiles = tileReader.getNumYTiles();
 		int numTiles = xTiles * yTiles;
 		
 		// create the output directory
@@ -91,20 +94,11 @@ public class TileReaderCLI {
 		System.out.print(progressString);
 		long start = System.currentTimeMillis();
 		for (int xTile = 0; xTile < xTiles; ++xTile) {
-			int x = xTile * readWidth;
 			for (int yTile = 0; yTile < yTiles; ++yTile) {
-				int y = yTile * readHeight;
-				
-				// we have to correct the readHeight at the bottom edge or we'll get an exception
-				int myReadHeight = readHeight;
-				int heightToGo = reader.getHeight() - y;
-				if (heightToGo < readHeight) {
-					myReadHeight = heightToGo;
-				}
-				
+
 				BufferedImage image;
 				try {
-					image = reader.read(x, y, readWidth, myReadHeight);
+					image = tileReader.read(xTile, yTile);
 				} catch (Exception e) {
 					System.err.println("Caught an exception while trying to read tile (" + xTile + ", " + yTile + ")\n" + e);
 					continue;
