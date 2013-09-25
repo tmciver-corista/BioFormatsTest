@@ -72,8 +72,8 @@ public class TileReader {
 		}
 
 		// calc x and y tile numbers
-		int xTiles = reader.getWidth() / readWidth;
-		int yTiles = reader.getHeight() / readHeight;
+		int xTiles = (int)Math.ceil((double)reader.getWidth() / readWidth);
+		int yTiles = (int)Math.ceil((double)reader.getHeight() / readHeight);
 		int numTiles = xTiles * yTiles;
 		
 		// create the output directory
@@ -83,7 +83,7 @@ public class TileReader {
 			return;
 		}
 		
-		System.out.println("Proceeding to read " + numTiles + " tiles (" + yTiles + " rows, " + xTiles + " columns) . . .");
+		System.out.println("Preparing to read " + numTiles + " tiles (" + yTiles + " rows, " + xTiles + " columns) . . .");
 
 		int tileNum = 1;
 		String progressFormatStr = "%.1f%% complete";
@@ -94,11 +94,16 @@ public class TileReader {
 			int x = xTile * readWidth;
 			for (int yTile = 0; yTile < yTiles; ++yTile) {
 				int y = yTile * readHeight;
+				int myReadHeight = readHeight;
+				int heightToGo = reader.getHeight() - y;
+				if (heightToGo < readHeight) {
+					myReadHeight = heightToGo;
+				}
 				BufferedImage image;
 				try {
-					image = reader.read(x, y, readWidth, readHeight);
+					image = reader.read(x, y, readWidth, myReadHeight);
 				} catch (Exception e) {
-					System.err.println("Caught an exception while trying to read tile (" + xTile + ", " + yTile + "), " + e);
+					System.err.println("Caught an exception while trying to read tile (" + xTile + ", " + yTile + ")\n" + e);
 					continue;
 				}
 				
