@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
-public class TileReader {
+public class TileReaderCLI {
 	
 	private static final String READ_WIDTH_PARAM_NAME = "readWidth";
 	private static final String READ_HEIGHT_PARAM_NAME = "readHeight";
@@ -94,11 +94,14 @@ public class TileReader {
 			int x = xTile * readWidth;
 			for (int yTile = 0; yTile < yTiles; ++yTile) {
 				int y = yTile * readHeight;
+				
+				// we have to correct the readHeight at the bottom edge or we'll get an exception
 				int myReadHeight = readHeight;
 				int heightToGo = reader.getHeight() - y;
 				if (heightToGo < readHeight) {
 					myReadHeight = heightToGo;
 				}
+				
 				BufferedImage image;
 				try {
 					image = reader.read(x, y, readWidth, myReadHeight);
