@@ -46,6 +46,8 @@ public class TileReader {
 			return;
 		}
 		
+		System.out.println("Source image has size " + reader.getHeight() + "x" + reader.getWidth() + " pixels.");
+		
 		// set the tile dimensions
 		int readWidth = DEFAULT_READ_WIDTH;
 		int readHeight = DEFAULT_READ_HEIGHT;
@@ -75,7 +77,7 @@ public class TileReader {
 		int numTiles = xTiles * yTiles;
 		
 		// create the output directory
-		File outputDir= new File(imageFilePath.substring(0, imageFilePath.lastIndexOf('.')) + "_tiles");
+		File outputDir = new File(imageFilePath.substring(0, imageFilePath.lastIndexOf('.')) + "_tiles");
 		if (!outputDir.mkdir()) {
 			System.err.println("Could not create output directory.");
 			return;
@@ -83,6 +85,11 @@ public class TileReader {
 		
 		System.out.println("Proceeding to read " + numTiles + " tiles (" + yTiles + " rows, " + xTiles + " columns) . . .");
 
+		int tileNum = 1;
+		String progressFormatStr = "%.1f%% complete";
+		String progressString = String.format(progressFormatStr, 0.0);
+		System.out.print(progressString);
+		long start = System.currentTimeMillis();
 		for (int xTile = 0; xTile < xTiles; ++xTile) {
 			int x = xTile * readWidth;
 			for (int yTile = 0; yTile < yTiles; ++yTile) {
@@ -99,8 +106,16 @@ public class TileReader {
 				String tileName = String.format("%d_%d.jpg", xTile, yTile);
 				ImageIO.write(image, "jpg", new File(outputDir, tileName));
 				
-				System.out.println("Wrote tile (" + xTile + ", " + yTile + ") to file.");
+				// update progress reporting
+				int progressStringLength = progressString.length();
+				while (progressStringLength-- > 0) {
+					System.out.print("\b");
+				}
+				progressString = String.format(progressFormatStr, (double)tileNum++/numTiles*100.0);
+				System.out.print(progressString);
 			}
 		}
+		double duration = (System.currentTimeMillis() - start) / 1000.0;
+		System.out.println(String.format("%nCompleted in %.1f seconds.", duration));
 	}
 }

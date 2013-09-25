@@ -26,6 +26,7 @@ public class BioFormatsReader implements ImageReader {
 		options = new ImporterOptions();
 		options.setId(filename);
 		options.setCrop(true);
+		options.setAutoscale(false);
 		
 		ImportProcess process = new ImportProcess(options);
 		try {
@@ -36,8 +37,7 @@ public class BioFormatsReader implements ImageReader {
 			throw new IOException("Error executing ImportProcess.");
 		}
 		
-		// get the width and height
-		// create format reader
+		// create ImagePlusReader
 	    reader = new ImagePlusReader(process);
 	    
 	    // use an IFormatReader to get width and height
