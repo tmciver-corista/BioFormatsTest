@@ -41,7 +41,7 @@ public class TileReaderCLI {
 		// create an ImageReader
 		ImageReader reader;
 		try {
-			reader = new BioFormatsReader(imageFilePath);
+			reader = new BioFormatsReader(imageFilePath, 0, 0);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
