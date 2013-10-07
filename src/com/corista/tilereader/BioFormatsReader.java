@@ -14,27 +14,25 @@ public class BioFormatsReader implements ImageReader {
 	private int height;
 
 	public BioFormatsReader(String filename, int seriesNumber, int imageNumber) throws IOException {
-
-		loci.formats.IFormatReader formatReader = new loci.formats.ImageReader();
+	    
+	    imageReader = new BufferedImageReader();
 	    
 	    // set the ID (image file name)
 	    try {
-	    	formatReader.setId(filename);
+	    	imageReader.setId(filename);
 		} catch (FormatException e) {
-			formatReader.close();
+			imageReader.close();
 			throw new IOException(e);
 		}
 	    
-	    imageReader = new BufferedImageReader(formatReader);
-	    
 	    // set the series number
 	    imageReader.setSeries(seriesNumber);
+	    
+	    this.imageNumber = imageNumber;
 
 	    // get the width and height
 	    width = imageReader.getSizeX();
 	    height = imageReader.getSizeY();
-	    
-	    imageReader.close();
 	}
 
 	@Override
@@ -54,6 +52,7 @@ public class BioFormatsReader implements ImageReader {
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
+		imageReader.close();
 	}
 
 	@Override
